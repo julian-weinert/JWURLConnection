@@ -1,0 +1,3 @@
+[submodule "JWRESTClient"]
+	path = JWRESTClient
+	url = https://github.com/julian-weinert/JWRESTClient.git
