@@ -55,10 +55,12 @@ Easily drop the four files into your project and `#include "JWURLConnection.h`
 ## Credits
 Inspired by ASIHTTPRequest and many others
 
-## Contact
+
+## Contact / Reference
 Julian Weinert
-- http://www.csundm.de
-- j.weinert@csundm.de
+
+- https://github.com/julian-weinert
+- https://stackoverflow.com/users/1041122/julian
 
 ## License
-License to be implemented
+`JWURLConnection` is available under the GPL V2 license. See the LICENSE file for more info.
