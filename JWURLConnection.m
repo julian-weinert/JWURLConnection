@@ -511,7 +511,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 		[super start];
 		
 		if ([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1]) {
-			XLog(@"connection started: %@", [[self originalRequest] URL]);
+			NSLog(@"connection started: %@", [[self originalRequest] URL]);
 			CFRunLoopRun();
 		}
 	}];
@@ -522,7 +522,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	
 	if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
 		CFRunLoopStop(CFRunLoopGetCurrent());
-	XLog(@"connection canceled");
+		NSLog(@"connection canceled");
 	}
 }
 
@@ -727,7 +727,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 		_responseData = nil;
 		
 		if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
-			XLog(@"connection finished");
+			NSLog(@"connection finished");
 			CFRunLoopStop(CFRunLoopGetCurrent());
 		}
 		
@@ -736,7 +736,8 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 }
 
 - (void)connection:(JWURLConnection *)connection didFailWithError:(NSError *)error {
-	PPLog(@"failedURL: %@ with error: %@", [[connection originalRequest] URL], [error localizedDescription]);
+	NSLog(@"failedURL: %@ with error: %@", [[connection originalRequest] URL], [error localizedDescription]);
+	
 	if ([_delegate respondsToSelector:_didFailSelector]) {
 		objc_msgSend(_delegate, _didFailSelector, connection, error);
 	}
@@ -758,7 +759,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	[[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskID];
 	if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
 		CFRunLoopStop(CFRunLoopGetCurrent());
-		XLog(@"connection failed");
+		NSLog(@"connection failed");
 	}
 }
 
