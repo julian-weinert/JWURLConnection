@@ -1,5 +1,5 @@
 //
-//  JWURLConnection.h
+//  JWURLConnection.m
 //
 //  Created by Julian Weinert on 07.01.13.
 //  Copyright (c) 2013 Julian Weinert.
