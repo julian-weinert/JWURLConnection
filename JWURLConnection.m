@@ -557,7 +557,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 		_willSendRequestForAuthenticationChallenge(challenge);
 	}
 	else {
-//		[[challenge sender] performDefaultHandlingForAuthenticationChallenge:challenge];
+		[[challenge sender] performDefaultHandlingForAuthenticationChallenge:challenge];
 	}
 }
 
