@@ -33,7 +33,23 @@ Easily drop the four files into your project and `#include "JWURLConnection.h`
 	[conn setFailed:^(JWURLConnection *con, NSError *err) {
 		NSLog(@"%@\ndid fail: %@", [output text], [err description]);
 	}];
-	
+	// Trust own SSL certificate for HTTPS
+	[conn setWillSendRequestForAuthenticationChallenge:^(NSURLAuthenticationChallenge *challenge) {
+			
+		SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+		SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, 0);
+		NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
+		NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"MyLocalCertificate" ofType:@"cer"];
+		NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
+		
+		if ([remoteCertificateData isEqualToData:localCertData]) {
+			NSURLCredential *credential = [NSURLCredential credentialForTrust:serverTrust];
+			[[challenge sender] useCredential:credential forAuthenticatinChallenge:challenge];
+		}
+		else {
+			[[challenge sender] cancelAuthenticationChallenge:challenge];
+		}
+	}];
 	[conn start];
 }
 

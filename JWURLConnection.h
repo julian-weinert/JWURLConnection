@@ -1,21 +1,10 @@
 //
 //  JWURLConnection.h
+//  t
 //
 //  Created by Julian Weinert on 07.01.13.
-//  Copyright (c) 2013 Julian Weinert.
+//  Copyright (c) 2013 Julian Weinert. All rights reserved.
 //
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 2 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #import <Foundation/Foundation.h>
 #import <objc/message.h>
@@ -63,7 +52,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 
 @property (nonatomic, assign) NSStringEncoding defaultStringEncoding;
 @property (nonatomic, assign) NSInteger expectedContentLength;
-@property (nonatomic, assign) BOOL trustAllCertificates;
 @property (nonatomic, assign) NSStringEncoding encoding;
 @property (nonatomic, retain) NSDictionary *userInfo;
 @property (nonatomic, assign) NSInteger statusCode;
@@ -85,8 +73,8 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @property (nonatomic, assign) SEL didFinishLoadingDataSelector;
 @property (nonatomic, assign) SEL didFailSelector;
 
-@property (nonatomic, assign) SEL canAuthenticateAgainstProtectionSpaceSelector;
-@property (nonatomic, assign) SEL didReceiveAuthenticationChallengeSelector;
+@property (nonatomic, assign) SEL willSendRequestForAuthenticationChallengeSelector;
+
 
 @property (nonatomic, assign) SEL didTrustCertificateWithHostSelector;
 @property (nonatomic, assign) SEL didAvoidSecurityTrapSelector;
@@ -103,8 +91,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @property (nonatomic, copy) void (^finished)(NSData *responseData, NSStringEncoding encoding);
 @property (nonatomic, copy) void (^failed)(NSError *error);
 
-@property (nonatomic, copy) BOOL (^authenticateAgainstProtectionSpace)(NSURLProtectionSpace *protectionSpace);
-@property (nonatomic, copy) void (^receivedAuthenticationChallenge)(NSURLAuthenticationChallenge *challenge);
+@property (nonatomic, copy) void (^willSendRequestForAuthenticationChallenge)(NSURLAuthenticationChallenge *challenge);
 
 @property (nonatomic, copy) void (^trustedCertificateWithHost)(NSString *host, NSURLAuthenticationChallenge *challenge);
 @property (nonatomic, copy) void (^avoidedSecurityTrap)(NSURLAuthenticationChallenge *challenge);
@@ -173,8 +160,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @protocol JWURLConnectionDelegate <NSObject>
 
 @optional
-- (BOOL)URLConnection:(JWURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace;
-- (void)URLConnection:(JWURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+- (void)URLconnection:(JWURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 
 - (void)URLConnectionDidEnd:(JWURLConnection *)connection;
 - (void)URLConnection:(JWURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response;

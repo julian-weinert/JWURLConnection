@@ -1,25 +1,16 @@
 //
 //  JWURLConnection.m
+//  t
 //
 //  Created by Julian Weinert on 07.01.13.
-//  Copyright (c) 2013 Julian Weinert.
+//  Copyright (c) 2013 Julian Weinert. All rights reserved.
 //
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 2 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static NSMutableArray *trustedHosts;
 
 #import "JWURLConnection.h"
+#import <Security/Security.h>
+
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
 
 @implementation JWByteWriter
@@ -61,32 +52,32 @@ JWHTTPMethod JWHTTPMethodFromNSString(NSString *method) {
 NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	switch (method) {
 		case JWHTTPget:
-			return @"GET";
-			break;
+		return @"GET";
+		break;
 		case JWHTTPpost:
-			return @"POST";
-			break;
+		return @"POST";
+		break;
 		case JWHTTPhead:
-			return @"HEAD";
-			break;
+		return @"HEAD";
+		break;
 		case JWHTTPput:
-			return @"PUT";
-			break;
+		return @"PUT";
+		break;
 		case JWHTTPdelete:
-			return @"DELETE";
-			break;
+		return @"DELETE";
+		break;
 		case JWHTTPconnect:
-			return @"CONNECT";
-			break;
+		return @"CONNECT";
+		break;
 		case JWHTTPoptions:
-			return @"OPTIONS";
-			break;
+		return @"OPTIONS";
+		break;
 		case JWHTTPtrace:
-			return @"TRACE";
-			break;
+		return @"TRACE";
+		break;
 		default:
-			return nil;
-			break;
+		return nil;
+		break;
 	}
 }
 
@@ -522,7 +513,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 		[super start];
 		
 		if ([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1]) {
-			NSLog(@"connection started: %@", [[self originalRequest] URL]);
 			CFRunLoopRun();
 		}
 	}];
@@ -533,7 +523,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	
 	if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
 		CFRunLoopStop(CFRunLoopGetCurrent());
-		NSLog(@"connection canceled");
 	}
 }
 
@@ -547,65 +536,22 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 
 #pragma mark PROTOCOL
 
-- (BOOL)connection:(JWURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
-	if ([_delegate respondsToSelector:_canAuthenticateAgainstProtectionSpaceSelector]) {
-		return (BOOL)[_delegate performSelector:_canAuthenticateAgainstProtectionSpaceSelector withObject:protectionSpace];
+- (void)connection:(JWURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+	if ([_delegate respondsToSelector:_willSendRequestForAuthenticationChallengeSelector]) {
+		[_delegate performSelector:_willSendRequestForAuthenticationChallengeSelector withObject:connection withObject:challenge];
 	}
-	if ([_delegate respondsToSelector:@selector(URLConnection:canAuthenticateAgainstProtectionSpace:)]) {
-		return [_delegate URLConnection:connection canAuthenticateAgainstProtectionSpace:protectionSpace];
+	else if ([_delegate respondsToSelector:@selector(URLconnection:willSendRequestForAuthenticationChallenge:)]) {
+		[_delegate URLconnection:connection willSendRequestForAuthenticationChallenge:challenge];
 	}
-	if (_canAuthenticateAgainstProtectionSpaceSelector) {
-		return _authenticateAgainstProtectionSpace(protectionSpace);
-	}
-	
-	return NO;
-}
-
-- (void)connection:(JWURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-	if ([_delegate respondsToSelector:_didReceiveAuthenticationChallengeSelector]) {
-		[_delegate performSelector:_didReceiveAuthenticationChallengeSelector withObject:challenge];
-	}
-	else if ([_delegate respondsToSelector:@selector(URLConnection:didReceiveAuthenticationChallenge:)]) {
-		[_delegate URLConnection:connection didReceiveAuthenticationChallenge:challenge];
-	}
-	else if (_receivedAuthenticationChallenge) {
-		_receivedAuthenticationChallenge(challenge);
-	}
-	else if (_trustAllCertificates) {
-		[[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+	else if (_willSendRequestForAuthenticationChallenge) {
+		_willSendRequestForAuthenticationChallenge(challenge);
 	}
 	else {
-		if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust] && [trustedHosts containsObject:[[challenge protectionSpace] host]]) {
-			if ([_delegate respondsToSelector:@selector(URLConnection:didTrustCertificateWithHost:withAuthenticationChallenge:)]) {
-				[_delegate URLConnection:connection didTrustCertificateWithHost:[[challenge protectionSpace] host] withAuthenticationChallenge:challenge];
-			}
-			if ([_delegate respondsToSelector:_didTrustCertificateWithHostSelector]) {
-				objc_msgSend(_delegate, _didTrustCertificateWithHostSelector, connection, [[challenge protectionSpace] host], challenge);
-			}
-			if (_trustedCertificateWithHost) {
-				_trustedCertificateWithHost([[challenge protectionSpace] host], challenge);
-			}
-			
-			[[challenge sender] useCredential:[NSURLCredential credentialForTrust:[[challenge protectionSpace] serverTrust]] forAuthenticationChallenge:challenge];
-		}
-		else {
-			if ([_delegate respondsToSelector:@selector(URLConnection:didAvoidSecurityTrapWithAuthenticationChallenge:)]) {
-				[_delegate URLConnection:self didAvoidSecurityTrapWithAuthenticationChallenge:challenge];
-			}
-			if ([_delegate respondsToSelector:_didAvoidSecurityTrapSelector]) {
-				objc_msgSend(_delegate, _didAvoidSecurityTrapSelector, connection, challenge);
-			}
-			if (_avoidedSecurityTrap) {
-				_avoidedSecurityTrap(challenge);
-			}
-			
-			[[challenge sender] cancelAuthenticationChallenge:challenge];
-		}
+//		[[challenge sender] performDefaultHandlingForAuthenticationChallenge:challenge];
 	}
 }
 
 - (void)connection:(JWURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-	
 	_responseData = [[NSMutableData alloc] init];
 	_statusCode = [(NSHTTPURLResponse *)response statusCode];
 	_expectedContentLength = (NSInteger)[response expectedContentLength];
@@ -738,7 +684,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 		_responseData = nil;
 		
 		if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
-			NSLog(@"connection finished");
 			CFRunLoopStop(CFRunLoopGetCurrent());
 		}
 		
@@ -747,8 +692,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 }
 
 - (void)connection:(JWURLConnection *)connection didFailWithError:(NSError *)error {
-	NSLog(@"failedURL: %@ with error: %@", [[connection originalRequest] URL], [error localizedDescription]);
-	
 	if ([_delegate respondsToSelector:_didFailSelector]) {
 		objc_msgSend(_delegate, _didFailSelector, connection, error);
 	}
@@ -770,7 +713,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	[[UIApplication sharedApplication] endBackgroundTask:_backgroundTaskID];
 	if (([(NSNumber *)[[[NSThread currentThread] threadDictionary] objectForKey:@"count"] isEqual:@1])) {
 		CFRunLoopStop(CFRunLoopGetCurrent());
-		NSLog(@"connection failed");
 	}
 }
 
