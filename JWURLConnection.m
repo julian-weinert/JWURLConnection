@@ -20,7 +20,6 @@
 static NSMutableArray *trustedHosts;
 
 #import "JWURLConnection.h"
-#import <Security/Security.h>
 
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
 
@@ -63,32 +62,32 @@ JWHTTPMethod JWHTTPMethodFromNSString(NSString *method) {
 NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method) {
 	switch (method) {
 		case JWHTTPget:
-		return @"GET";
-		break;
+			return @"GET";
+			break;
 		case JWHTTPpost:
-		return @"POST";
-		break;
+			return @"POST";
+			break;
 		case JWHTTPhead:
-		return @"HEAD";
-		break;
+			return @"HEAD";
+			break;
 		case JWHTTPput:
-		return @"PUT";
-		break;
+			return @"PUT";
+			break;
 		case JWHTTPdelete:
-		return @"DELETE";
-		break;
+			return @"DELETE";
+			break;
 		case JWHTTPconnect:
-		return @"CONNECT";
-		break;
+			return @"CONNECT";
+			break;
 		case JWHTTPoptions:
-		return @"OPTIONS";
-		break;
+			return @"OPTIONS";
+			break;
 		case JWHTTPtrace:
-		return @"TRACE";
-		break;
+			return @"TRACE";
+			break;
 		default:
-		return nil;
-		break;
+			return nil;
+			break;
 	}
 }
 
