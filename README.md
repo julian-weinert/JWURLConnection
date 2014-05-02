@@ -54,6 +54,7 @@ Easily drop the four files into your project and `#include "JWURLConnection.h`
 
 ## Credits
 Inspired by ASIHTTPRequest and many others
+
 `JWURLConnection` was originally created for http://www.csundm.com
 
 
