@@ -64,7 +64,6 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 
 @property (nonatomic, assign) NSStringEncoding defaultStringEncoding;
 @property (nonatomic, assign) NSInteger expectedContentLength;
-@property (nonatomic, assign) BOOL trustAllCertificates;
 @property (nonatomic, assign) NSStringEncoding encoding;
 @property (nonatomic, retain) NSDictionary *userInfo;
 @property (nonatomic, assign) NSInteger statusCode;
@@ -86,8 +85,8 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @property (nonatomic, assign) SEL didFinishLoadingDataSelector;
 @property (nonatomic, assign) SEL didFailSelector;
 
-@property (nonatomic, assign) SEL canAuthenticateAgainstProtectionSpaceSelector;
-@property (nonatomic, assign) SEL didReceiveAuthenticationChallengeSelector;
+@property (nonatomic, assign) SEL willSendRequestForAuthenticationChallengeSelector;
+
 
 @property (nonatomic, assign) SEL didTrustCertificateWithHostSelector;
 @property (nonatomic, assign) SEL didAvoidSecurityTrapSelector;
@@ -104,8 +103,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @property (nonatomic, copy) void (^finished)(NSData *responseData, NSStringEncoding encoding);
 @property (nonatomic, copy) void (^failed)(NSError *error);
 
-@property (nonatomic, copy) BOOL (^authenticateAgainstProtectionSpace)(NSURLProtectionSpace *protectionSpace);
-@property (nonatomic, copy) void (^receivedAuthenticationChallenge)(NSURLAuthenticationChallenge *challenge);
+@property (nonatomic, copy) void (^willSendRequestForAuthenticationChallenge)(NSURLAuthenticationChallenge *challenge);
 
 @property (nonatomic, copy) void (^trustedCertificateWithHost)(NSString *host, NSURLAuthenticationChallenge *challenge);
 @property (nonatomic, copy) void (^avoidedSecurityTrap)(NSURLAuthenticationChallenge *challenge);
@@ -174,8 +172,7 @@ NSString *NSStringFromJWHTTPMethod(JWHTTPMethod method);
 @protocol JWURLConnectionDelegate <NSObject>
 
 @optional
-- (BOOL)URLConnection:(JWURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace;
-- (void)URLConnection:(JWURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+- (void)URLconnection:(JWURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 
 - (void)URLConnectionDidEnd:(JWURLConnection *)connection;
 - (void)URLConnection:(JWURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response;
